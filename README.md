@@ -1,44 +1,172 @@
-# Full Stack API Final Project
+# Trivia API Documentation
+## Error Handling
+Errors are returned as JSON objects in the following format:
 
-## Full Stack Trivia
+        {
+	      "error": 405, 
+	      "message": "Method Not Allowed", 
+	      "success": false
+	    }
+	    
+The API will return  4 error types when requests fail:
+* 400: Bad Request
+* 404: Resource Not Found
+* 405: Method Not Allowed
+* 422: Not Processable
 
-Udacity is invested in creating bonding experiences for its employees and students. A bunch of team members got the idea to hold trivia on a regular basis and created a  webpage to manage the trivia app and play the game, but their API experience is limited and still needs to be built out. 
+## Endpoints
+### GET /questions
+* General:
+	* Returns a list of categories, question objects, current category, success value and total number of questions
+	* Results are paginated in groups of 10. Include a request argument *page* to choose page number, starting from 1
+* Sample: 
 
-That's where you come in! Help them finish the trivia app so they can start holding trivia and seeing who's the most knowledgeable of the bunch. The application must:
+	    curl http://127.0.0.1:5000/questions
 
-1) Display questions - both all questions and by category. Questions should show the question, category and difficulty rating by default and can show/hide the answer. 
-2) Delete questions.
-3) Add questions and require that they include question and answer text.
-4) Search for questions based on a text query string.
-5) Play the quiz game, randomizing either all questions or within a specific category. 
+* Response:
 
-Completing this trivia app will give you the ability to structure plan, implement, and test an API - skills essential for enabling your future applications to communicate with others. 
+        {
+      "categories": {
+        "1": "Science", 
+        "2": "Art", 
+        "3": "Geography", 
+        "4": "History", 
+        "5": "Entertainment", 
+        "6": "Sports"
+      }, 
+      "current_category": "Science", 
+      "page": 1, 
+      "questions": [
+        {
+          "answer": "Maya Angelou", 
+          "category": 4, 
+          "difficulty": 2, 
+          "id": 5, 
+          "question": "Whose autobiography is entitled 'I Know Why the Caged Bird Sings'?"
+        }, 
+        {
+          "answer": "Muhammad Ali", 
+          "category": 4, 
+          "difficulty": 1, 
+          "id": 9, 
+          "question": "What boxer's original name is Cassius Clay?"
+        }, 
+      ], 
+      "success": true, 
+      "total_questions": 2
 
-## Tasks
+### GET /categories
+* General:
+	* Returns a list of categories and success value
+* Sample: 
+	
+	    curl http://127.0.0.1:5000/categories
 
-There are `TODO` comments throughout project. Start by reading the READMEs in:
+* Response:
 
-1. [`./frontend/`](./frontend/README.md)
-2. [`./backend/`](./backend/README.md)
+	    {
+	      "categories": {
+	        "1": "Science", 
+	        "2": "Art", 
+	        "3": "Geography", 
+	        "4": "History", 
+	        "5": "Entertainment", 
+	        "6": "Sports"
+	      }, 
+	      "success": true
+	    }
 
-We recommend following the instructions in those files in order. This order will look familiar from our prior work in the course.
+### GET /categories/\<id\>/questions
+* General:
+	* Returns a list of question objects for category id *id*
 
-## Starting and Submitting the Project
+* Sample: 
+	
 
-[Fork](https://help.github.com/en/articles/fork-a-repo) the [project repository]() and [Clone](https://help.github.com/en/articles/cloning-a-repository) your forked repository to your machine. Work on the project locally and make sure to push all your changes to the remote repository before submitting the link to your repository in the Classroom. 
+	    curl http://127.0.0.1:5000/categories/1/questions
 
-## About the Stack
+* Response:
+	
+	    {
+		      "current_category": "Science", 
+		      "questions": [
+		        {
+		          "answer": "Alexander Fleming", 
+		          "category": 1, 
+		          "difficulty": 3, 
+		          "id": 21, 
+		          "question": "Who discovered penicillin?"
+		        }, 
+		        {
+		          "answer": "Blood", 
+		          "category": 1, 
+		          "difficulty": 4, 
+		          "id": 22, 
+		          "question": "Hematology is a branch of medicine involving the study of what?"
+		        }, 
+		        {
+		          "answer": "answertext", 
+		          "category": 1, 
+		          "difficulty": 1, 
+		          "id": 61, 
+		          "question": "questiontext"
+		        }
+		      ], 
+		      "success": true, 
+		      "total_questions": 3
+		   }
+	   
+### DELETE /questions/\<id\>
+* General:
+	*  Deletes the question with id *id*
 
-We started the full stack application for you. It is desiged with some key functional areas:
+* Sample: 
+	
 
-### Backend
+	    curl -X DELETE http://127.0.0.1:5000/questions/23
+* Response:
 
-The `./backend` directory contains a partially completed Flask and SQLAlchemy server. You will work primarily in app.py to define your endpoints and can reference models.py for DB and SQLAlchemy setup. 
+	    {
+	      "deleted": 23, 
+	      "success": true
+	    }
+	      
 
-### Frontend
+### POST /questions
+* General:
+	* Inserts a new question with values for question, answer, category and difficulty in the body
+	* Returns a success value
 
-The `./frontend` directory contains a complete React frontend to consume the data from the Flask server. You will need to update the endpoints after you define them in the backend. Those areas are marked with TODO and can be searched for expediency. 
+* Sample: 
 
-Pay special attention to what data the frontend is expecting from each API response to help guide how you format your API. 
+	    curl 	--header "Content-Type: application/json" --request POST \
+				--data '{"question":"Frage","answer":"Antwort", "category":1, "difficulty":1}' \
+				http://127.0.0.1:5000/questions
+* Response:
 
-[View the README.md within ./frontend for more details.](./frontend/README.md)
+	    {
+	    	  "success": true
+	    }
+
+### POST /quizzes
+* General:
+	* Returns a success value and one question, excludes question ids from the array *previous_questions*
+	
+* Sample: 
+
+		curl 	--header "Content-Type: application/json" \
+				--request POST \
+				--data '{"previous_questions":[4], "quiz_category":{"type":"Science", "id":"1"}}' 	\	
+				http://127.0.0.1:5000/quizzes
+* Response:
+
+	    {
+	      "question": {
+	        "answer": "Tom Cruise", 
+	        "category": 5, 
+	        "difficulty": 4, 
+	        "id": 4, 
+	        "question": "What actor did author Anne Rice first denounce, then praise in the role of her beloved Lestat?"
+	      }, 
+	      "success": true
+	    }
