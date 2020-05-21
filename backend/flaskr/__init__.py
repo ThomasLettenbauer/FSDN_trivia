@@ -99,8 +99,10 @@ def create_app(test_config=None):
 
             if searchterm:
                 ''' SEARCH '''
-                questions = Question.query.filter(Question.question.ilike("%" + searchterm + "%"))
-                formatted_questions = [question.format() for question in questions]
+                questions = Question.query.filter(
+                    Question.question.ilike("%" + searchterm + "%"))
+                formatted_questions = [question.format()
+                                       for question in questions]
 
                 return jsonify({
                     'success': True,
@@ -133,7 +135,8 @@ def create_app(test_config=None):
 
             if quiz_category['id'] == 0:
                 # All Categories
-                question = Question.query.order_by(func.random()).limit(1).all()[0]
+                question = Question.query.order_by(
+                    func.random()).limit(1).all()[0]
                 formatted_question = question.format()
             else:
                 # One Category
@@ -155,7 +158,7 @@ def create_app(test_config=None):
             "success": False,
             "error": 400,
             "message": "Bad request"
-            }), 400
+        }), 400
 
     @app.errorhandler(404)
     def not_found(error):
@@ -163,7 +166,15 @@ def create_app(test_config=None):
             "success": False,
             "error": 404,
             "message": "Not found"
-            }), 404
+        }), 404
+
+    @app.errorhandler(405)
+    def not_found(error):
+        return jsonify({
+            "success": False,
+            "error": 405,
+            "message": "Method Not Allowed"
+        }), 405
 
     @app.errorhandler(422)
     def unprocessable(error):
@@ -171,6 +182,6 @@ def create_app(test_config=None):
             "success": False,
             "error": 422,
             "message": "unprocessable"
-            }), 422
+        }), 422
 
     return app

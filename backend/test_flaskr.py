@@ -94,7 +94,8 @@ class TriviaTestCase(unittest.TestCase):
             'difficulty': 1
         }
 
-        res = self.client().post('/questions', data=json.dumps(body), headers={'Content-Type': 'application/json'})
+        res = self.client().post('/questions', data=json.dumps(body),
+                                 headers={'Content-Type': 'application/json'})
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)
@@ -106,7 +107,8 @@ class TriviaTestCase(unittest.TestCase):
             'question': 'Frage',
         }
 
-        res = self.client().post('/questions', data=json.dumps(body), headers={'Content-Type': 'application/json'})
+        res = self.client().post('/questions', data=json.dumps(body),
+                                 headers={'Content-Type': 'application/json'})
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 400)
@@ -119,7 +121,8 @@ class TriviaTestCase(unittest.TestCase):
             'searchTerm': 'title',
         }
 
-        res = self.client().post('/questions', data=json.dumps(body), headers={'Content-Type': 'application/json'})
+        res = self.client().post('/questions', data=json.dumps(body),
+                                 headers={'Content-Type': 'application/json'})
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)
@@ -134,7 +137,8 @@ class TriviaTestCase(unittest.TestCase):
             'quiz_category': {'type': "Science", 'id': "1"}
         }
 
-        res = self.client().post('/quizzes', data=json.dumps(body), headers={'Content-Type': 'application/json'})
+        res = self.client().post('/quizzes', data=json.dumps(body),
+                                 headers={'Content-Type': 'application/json'})
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)
