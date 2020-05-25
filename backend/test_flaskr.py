@@ -60,6 +60,14 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(len(data['questions']))
         self.assertTrue(data['total_questions'] >= 0)
 
+    # Test ERROR - GET questions for wrong category
+    def test_get_questions_for_wrong_category(self):
+        res = self.client().get('/categories/999/questions')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 422)
+        self.assertEqual(data['success'], False)        
+
     # Test delete question
     def test_delete_question(self):
 
@@ -144,6 +152,21 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
         self.assertTrue(len(data['question']))
+
+    # Test quizzes endpoint with wrong category
+    def test_post_quizzes_wrong_category(self):
+
+        body = {
+            'previous_questions': [],
+            'quiz_category': {'type': "Test", 'id': "999"}
+        }
+
+        res = self.client().post('/quizzes', data=json.dumps(body),
+                                 headers={'Content-Type': 'application/json'})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual(data['success'], False)
 
 
 # Make the tests conveniently executable
