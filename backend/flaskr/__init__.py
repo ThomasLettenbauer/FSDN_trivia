@@ -156,14 +156,22 @@ def create_app(test_config=None):
                 'success': True,
                 'question': formatted_question
             })
+
+        # We have no more questions
+        except IndexError:
+            return jsonify({
+                'success': True,
+                'question': ''
+            })
+
         except Exception:
             abort(400)
 
     # Errorhandlers
-
     @app.errorhandler(400)
     def not_found(error):
         return jsonify({
+
             "success": False,
             "error": 400,
             "message": "Bad request"
