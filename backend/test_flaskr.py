@@ -1,10 +1,9 @@
 import os
 import unittest
 import json
-from flask_sqlalchemy import SQLAlchemy
 
 from flaskr import create_app
-from models import setup_db, Question, Category
+from models import Question
 
 
 class TriviaTestCase(unittest.TestCase):
@@ -12,22 +11,23 @@ class TriviaTestCase(unittest.TestCase):
 
     def setUp(self):
         """Define test variables and initialize app."""
-        self.app = create_app()
-        self.client = self.app.test_client
         self.database_name = "trivia_test"
-        self.database_path = "postgres:///{}".format(self.database_name)
-        setup_db(self.app, self.database_path)
+        self.database_path = os.environ.get(
+            "TEST_DATABASE_URL",
+            "postgres:///{}".format(self.database_name)
+        )
+        self.app = create_app({
+            "TESTING": True,
+            "SQLALCHEMY_DATABASE_URI": self.database_path
+        })
+        self.client = self.app.test_client
 
-        # binds the app to the current context
-        with self.app.app_context():
-            self.db = SQLAlchemy()
-            self.db.init_app(self.app)
-            # create all tables
-            self.db.create_all()
+        self.app_context = self.app.app_context()
+        self.app_context.push()
 
     def tearDown(self):
-        """Executed after reach test"""
-        pass
+        """Executed after each test"""
+        self.app_context.pop()
 
     # Test GET all categories
     def test_get_categories(self):
@@ -66,7 +66,7 @@ class TriviaTestCase(unittest.TestCase):
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 422)
-        self.assertEqual(data['success'], False)        
+        self.assertEqual(data['success'], False)
 
     # Test delete question
     def test_delete_question(self):

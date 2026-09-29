@@ -1,31 +1,27 @@
 import os
-from sqlalchemy import Column, String, Integer, create_engine
+
 from flask_sqlalchemy import SQLAlchemy
-import json
+from sqlalchemy import Column, Integer, String
+
 
 database_name = "trivia"
-database_path = "postgres:///{}".format(database_name)
+database_path = os.environ.get(
+    "DATABASE_URL",
+    "postgres:///{}".format(database_name)
+)
 
 db = SQLAlchemy()
 
-'''
-setup_db(app)
-    binds a flask application and a SQLAlchemy service
-'''
-
 
 def setup_db(app, database_path=database_path):
-    app.config["SQLALCHEMY_DATABASE_URI"] = database_path
-    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    db.app = app
+    """Bind the Flask application to SQLAlchemy and create missing tables."""
+    app.config.setdefault("SQLALCHEMY_DATABASE_URI", database_path)
+    app.config.setdefault("SQLALCHEMY_TRACK_MODIFICATIONS", False)
+
     db.init_app(app)
-    db.create_all()
 
-
-'''
-Question
-
-'''
+    with app.app_context():
+        db.create_all()
 
 
 class Question(db.Model):
@@ -34,7 +30,7 @@ class Question(db.Model):
     id = Column(Integer, primary_key=True)
     question = Column(String)
     answer = Column(String)
-    category = Column(String)
+    category = Column(Integer)
     difficulty = Column(Integer)
 
     def __init__(self, question, answer, category, difficulty):
@@ -62,12 +58,6 @@ class Question(db.Model):
             'category': self.category,
             'difficulty': self.difficulty
         }
-
-
-'''
-Category
-
-'''
 
 
 class Category(db.Model):

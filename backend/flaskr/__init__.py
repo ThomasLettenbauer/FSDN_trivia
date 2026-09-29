@@ -1,9 +1,6 @@
-import os
 from flask import Flask, request, abort, jsonify
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.sql.expression import func
 from flask_cors import CORS
-import random
+from sqlalchemy.sql.expression import func
 
 from models import setup_db, Question, Category, db
 
@@ -14,9 +11,13 @@ QUESTIONS_PER_PAGE = 10
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__)
+
+    if test_config:
+        app.config.update(test_config)
+
     setup_db(app)
 
-    cors = CORS(app, resources={r"/*": {"origins": "*"}})
+    CORS(app, resources={r"/*": {"origins": "*"}})
 
     @app.after_request
     def after_request(response):
@@ -65,7 +66,7 @@ def create_app(test_config=None):
     def get_categoryquestions(id):
         try:
             questions = Question.query.filter(Question.category == id)
-            category = Category.query.get(id)
+            category = db.session.get(Category, id)
             formatted_questions = [question.format() for question in questions]
 
             return jsonify({
