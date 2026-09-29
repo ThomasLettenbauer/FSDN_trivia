@@ -1,4 +1,5 @@
+#!/usr/bin/env bash
+set -e
+
 sudo service postgresql start
-export FLASK_APP=flaskr
-export FLASK_ENV=development
-flask run
+flask --app flaskr run --debug
